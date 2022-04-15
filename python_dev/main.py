@@ -79,7 +79,6 @@ def makeQR(config, path):
 # Запрашиваем имя клиента
 name = input("Enter client name:\n")
 # ip клиента с маской. В дальнейшем,  необходимо найти "свободные адреса"
-# В текущей реализации необходимо ввести только последний октет!
 free_ip = f'10.0.0.{getNewIP(getClientsNetworkData(wireguardConfFile, reg_last_oktet))}/32' 
 dns = '8.8.8.8'
 # Переменная пути к папке клиента, которую необходимо создать 
