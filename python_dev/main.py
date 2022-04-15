@@ -2,10 +2,13 @@
 import os
 import configparser
 import re
+import socket
 
 import peer
 
-wireguardIP = ''
+hostname = socket.gethostname()
+wireguardIP = f'{socket.gethostbyname(hostname)}:51830'
+
 wireguardConfFile = '/etc/wireguard/wg0.conf'
 wireguardPubKeyFile = '/etc/wireguard/publickey'
 rootClientFolder = '/etc/wireguard/clients/'
