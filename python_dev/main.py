@@ -3,6 +3,8 @@ import os
 import configparser
 import re
 
+import peer
+
 wireguardIP = ''
 wireguardConfFile = '/etc/wireguard/wg0.conf'
 wireguardPubKeyFile = '/etc/wireguard/publickey'
@@ -12,37 +14,6 @@ reg_all = r"AllowedIPs.*\s(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.(?P<last_oktet>\d{1,
 reg_ip = r"AllowedIPs.*\s(?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
 reg_last_oktet = r"AllowedIPs.*\s\d{1,3}\.\d{1,3}\.\d{1,3}\.(?P<last_oktet>\d{1,3})"
 
-class Peer:
-    def __init__(self, pk, ip):
-        self.pk = pk
-        self.ip = ip
-    
-    # client pub key
-    def get_pk(self):
-        return self.pk
-    
-    def get_ip(self):
-        return self.ip
-
-# Класс хранящий клиентов
-class Peers:
-    def __init__(self):
-        self.peers = list()
-
-    def add_peer(self, peer):
-        # добавление peer в list peers
-        d = {'PublicKey': peer.pk, 'AllowedIPs': peer.ip}
-        self.peers.append(d)
-    
-    def create_conf(self, file):
-        for i in self.peers:
-            file.write('[Peer]\n')
-            for key, value in i.items():
-                file.write(f'{key} = {value}\n')
-    
-    def append_data(self, path, data):
-        with open(path, 'a') as file:
-            data.create_conf(file)
 
 # Метод создания директорий
 def createFolder(dir_path): 
@@ -86,6 +57,8 @@ def getClientsNetworkData(wg_conf, reg):
 
 # Временное решение, необходимо сделать поиск "свободных" ip
 def getNewIP(ips_list):
+    if not ips_list:
+        ips_list = [1] 
     ip = max(ips_list) + 1
     if ip > 1 and ip < 255:
         return ip
@@ -124,8 +97,8 @@ generateClientKeys(client_priv_key, client_pub_key)
 # Генерация клиентского конфига и запись в файл
 writeData(client_conf, generateClientConfig(client_priv_key, free_ip, dns, wireguardPubKeyFile, wireguardIP))
 
-peers = Peers()
-peer0 = Peer(getFileContent(client_pub_key), free_ip)
+peers = peer.Peers()
+peer0 = peer.Peer(getFileContent(client_pub_key), free_ip)
 peers.add_peer(peer0)
 #appendData(wireguardConfFile,peers)
 peers.append_data(wireguardConfFile,peers)
