@@ -20,7 +20,7 @@ class Peers:
         d = {'PublicKey': peer.pk, 'AllowedIPs': peer.ip}
         self.peers.append(d)
     
-    def create_conf(self, file):
+    def write_conf(self, file):
         for i in self.peers:
             file.write('[Peer]\n')
             for key, value in i.items():
@@ -28,4 +28,4 @@ class Peers:
     
     def append_data(self, path, data):
         with open(path, 'a') as file:
-            data.create_conf(file)
+            data.write_conf(file)

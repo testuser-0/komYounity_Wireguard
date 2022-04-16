@@ -9,6 +9,7 @@ import peer
 hostname = socket.gethostname()
 wireguardIP = f'{socket.gethostbyname(hostname)}:51830'
 
+# добавить возможность генерирования новых конфигов
 wireguardConfFile = '/etc/wireguard/wg0.conf'
 wireguardPubKeyFile = '/etc/wireguard/publickey'
 rootClientFolder = '/etc/wireguard/clients/'
@@ -79,6 +80,10 @@ def writeData(path, data):
 def makeQR(config, path):
     os.system(f'qrencode -t PNG --output={path} < {config}')
 
+# restart wireguard wg
+def restartWireguard():
+    os.system('systemctl restart wg-quick@wg0')
+
 # Запрашиваем имя клиента
 name = input("Enter client name:\n")
 # ip клиента с маской. В дальнейшем,  необходимо найти "свободные адреса"
@@ -100,10 +105,10 @@ generateClientKeys(client_priv_key, client_pub_key)
 writeData(client_conf, generateClientConfig(client_priv_key, free_ip, dns, wireguardPubKeyFile, wireguardIP))
 
 peers = peer.Peers()
-peer0 = peer.Peer(getFileContent(client_pub_key), free_ip)
-peers.add_peer(peer0)
-#appendData(wireguardConfFile,peers)
+peers.add_peer(peer.Peer(getFileContent(client_pub_key), free_ip))
 peers.append_data(wireguardConfFile,peers)
 # Создание клиентского QR кода
 makeQR(client_conf,client_qr_code)
-# restart wireguard
+restartWireguard()
+
+
